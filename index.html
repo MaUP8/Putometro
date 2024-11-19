@@ -14,7 +14,7 @@
             color: #fff;
         }
         .container {
-            margin-top: 50px;
+            margin-top: 30px;
         }
         .meter {
             margin: 20px auto;
@@ -25,6 +25,7 @@
             border-radius: 25px;
             position: relative;
             overflow: hidden;
+            display: none; /* Oculto hasta que se mida */
         }
         .indicator {
             height: 100%;
@@ -60,7 +61,9 @@
             height: auto;
             border: 2px solid #ff0000;
             border-radius: 10px;
-            display: none;
+        }
+        #photoCanvas {
+            display: none; /* Oculto hasta que se toma la foto */
         }
         .phrase {
             margin-top: 20px;
@@ -72,14 +75,15 @@
 <body>
     <div class="container">
         <h1>🔥 Putómetro 🔥</h1>
-        <p>Mide tu nivel de "picante" con evidencia fotográfica. 😏</p>
-        <div class="meter">
+        <p>Tomá una foto y medí el nivel de "picante".</p>
+        <video id="camera" autoplay></video>
+        <canvas id="photoCanvas"></canvas>
+        <button class="button" id="takePhotoButton" onclick="takePhoto()">Tomar Foto</button>
+        <div class="meter" id="meter">
             <div class="indicator" id="indicator"></div>
             <div class="fire-icon" id="fire-icon">🔥</div>
         </div>
-        <button class="button" onclick="measureLevel()">Medir Nivel</button>
-        <video id="camera" autoplay></video>
-        <canvas id="photoCanvas"></canvas>
+        <button class="button" id="measureButton" onclick="measureLevel()" style="display: none;">Medir Nivel</button>
         <div class="phrase" id="phrase"></div>
     </div>
 
@@ -91,61 +95,25 @@
             "Un peligro andante. 🚨",
             "Sos un espectáculo en persona. 🎉",
             "Te pasaste de épico/a. 😎",
-            "Ya nadie te alcanza, estás en otra liga. 🏆",
             "Tu nivel es ilegal en 50 países. 🌍",
             "Cuidado, que incendias la pista. 💃🔥",
             "¡Mirá cómo brillás, estrella fugaz! 🌟",
             "Sos como una telenovela: puro drama y pasión. 😘",
-            "En el diccionario, tu nombre define 'fiesta'. 🎈",
-            "Sos más caliente que el verano en el Caribe. ☀️🔥",
-            "Te miran y dicen: 'Eso es arte'. 🎨",
-            "Te aplauden en las redes y en la vida real. 👏",
-            "Nivel: te llaman por apodos que no entendés. 😂",
-            "Sos el/la influencer del barrio. 📱",
-            "Si fueras cóctel, serías un Margarita picante. 🍹",
-            "No hay filtro que mejore tu flow, sos top. 🤳",
-            "Nivel experto: las miradas te siguen. 👀",
+            "Te ven llegar y suben la música. 🎵",
             "Bajale al fuego que estamos en alerta roja. 🚒",
             "Sos como el tequila: fuerte y difícil de olvidar. 🥃",
-            "Tu intensidad rompe récords. 💥",
             "Nivel bomba: explotás en cada lugar que vas. 💣",
-            "Te deberían cobrar entrada donde llegás. 🎟️",
-            "Sos el alma de la fiesta, literal. 🎶",
-            "Te ven llegar y suben la música. 🎵",
-            "Nivel: protagonista de todas las historias. 📖",
-            "Con vos siempre es carnaval. 🎭",
-            "Nivel descontrol: hasta tu sombra baila. 🕺",
             "Picante como salsa habanera. 🌶️🔥"
         ];
 
-        function measureLevel() {
-            const indicator = document.getElementById("indicator");
-            const fireIcon = document.getElementById("fire-icon");
-            const phrase = document.getElementById("phrase");
-            const video = document.getElementById("camera");
-            const canvas = document.getElementById("photoCanvas");
-            const ctx = canvas.getContext("2d");
+        const video = document.getElementById("camera");
+        const canvas = document.getElementById("photoCanvas");
+        const ctx = canvas.getContext("2d");
+        const meter = document.getElementById("meter");
+        const measureButton = document.getElementById("measureButton");
 
-            // Asegura que la barra siempre llegue al 100%
-            indicator.style.width = "100%";
-            fireIcon.style.display = "block";
-
-            // Cambia la frase
-            phrase.textContent = phrases[Math.floor(Math.random() * phrases.length)];
-
-            // Toma la foto
-            canvas.style.display = "block";
-            if (video.srcObject) {
-                canvas.width = video.videoWidth;
-                canvas.height = video.videoHeight;
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            }
-        }
-
+        // Inicia la cámara al cargar la página
         function startCamera() {
-            const video = document.getElementById("camera");
-            video.style.display = "block";
-
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then((stream) => {
                     video.srcObject = stream;
@@ -156,7 +124,31 @@
                 });
         }
 
-        // Activa la cámara al cargar la página
+        // Toma la foto y la muestra en el canvas
+        function takePhoto() {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.style.display = "block";
+            meter.style.display = "block"; // Muestra el medidor
+            measureButton.style.display = "block"; // Muestra el botón para medir nivel
+            document.getElementById("takePhotoButton").style.display = "none"; // Oculta el botón de tomar foto
+        }
+
+        // Mide el nivel y muestra el resultado
+        function measureLevel() {
+            const indicator = document.getElementById("indicator");
+            const fireIcon = document.getElementById("fire-icon");
+            const phrase = document.getElementById("phrase");
+
+            // Asegura que la barra siempre llegue al 100%
+            indicator.style.width = "100%";
+            fireIcon.style.display = "block";
+
+            // Cambia la frase
+            phrase.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+        }
+
         window.onload = startCamera;
     </script>
 </body>

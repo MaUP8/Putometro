@@ -33,6 +33,14 @@
             width: 0%;
             transition: width 0.5s ease-out;
         }
+        .fire-icon {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            font-size: 24px;
+            display: none;
+        }
         .button {
             margin: 10px auto;
             padding: 10px 20px;
@@ -46,7 +54,7 @@
         .button:hover {
             background-color: #cc0000;
         }
-        video {
+        video, canvas {
             margin-top: 20px;
             width: 300px;
             height: auto;
@@ -64,37 +72,73 @@
 <body>
     <div class="container">
         <h1>🔥 Putómetro 🔥</h1>
-        <p>Mide tu "nivel de joda". Advertencia: no te lo tomes personal... ¡o sí! 😏</p>
+        <p>Mide tu nivel de "picante" con evidencia fotográfica. 😏</p>
         <div class="meter">
             <div class="indicator" id="indicator"></div>
+            <div class="fire-icon" id="fire-icon">🔥</div>
         </div>
-        <button class="button" onclick="increaseMeter()">Subir Nivel</button>
-        <button class="button" onclick="startCamera()">Activar Cámara</button>
+        <button class="button" onclick="measureLevel()">Medir Nivel</button>
         <video id="camera" autoplay></video>
+        <canvas id="photoCanvas"></canvas>
         <div class="phrase" id="phrase"></div>
     </div>
 
     <script>
-        let meterValue = 0;
-        const phrases = [
-            "Te la mandaste toda, ¡nivel dios! 🔥",
-            "Aflojá, que así no se puede salir en público. 🤦‍♂️",
-            "Sos la reina de la noche. 👑",
-            "Mirá, ni la IA puede medir esto. 😱",
-            "100% peligro, cuidado al salir a la calle. 🚨",
-            "¿Con quién querés competir? Ya ganaste. 🏆",
-            "Una leyenda urbana de las pistas. 😎",
-            "Nivel: te invitan a todos lados por escándalo. 🎉"
+        let phrases = [
+            "¡Sos fuego puro! 🔥",
+            "Rey/reina de la noche. 👑",
+            "Nadie te para, ni la IA. 🚀",
+            "Un peligro andante. 🚨",
+            "Sos un espectáculo en persona. 🎉",
+            "Te pasaste de épico/a. 😎",
+            "Ya nadie te alcanza, estás en otra liga. 🏆",
+            "Tu nivel es ilegal en 50 países. 🌍",
+            "Cuidado, que incendias la pista. 💃🔥",
+            "¡Mirá cómo brillás, estrella fugaz! 🌟",
+            "Sos como una telenovela: puro drama y pasión. 😘",
+            "En el diccionario, tu nombre define 'fiesta'. 🎈",
+            "Sos más caliente que el verano en el Caribe. ☀️🔥",
+            "Te miran y dicen: 'Eso es arte'. 🎨",
+            "Te aplauden en las redes y en la vida real. 👏",
+            "Nivel: te llaman por apodos que no entendés. 😂",
+            "Sos el/la influencer del barrio. 📱",
+            "Si fueras cóctel, serías un Margarita picante. 🍹",
+            "No hay filtro que mejore tu flow, sos top. 🤳",
+            "Nivel experto: las miradas te siguen. 👀",
+            "Bajale al fuego que estamos en alerta roja. 🚒",
+            "Sos como el tequila: fuerte y difícil de olvidar. 🥃",
+            "Tu intensidad rompe récords. 💥",
+            "Nivel bomba: explotás en cada lugar que vas. 💣",
+            "Te deberían cobrar entrada donde llegás. 🎟️",
+            "Sos el alma de la fiesta, literal. 🎶",
+            "Te ven llegar y suben la música. 🎵",
+            "Nivel: protagonista de todas las historias. 📖",
+            "Con vos siempre es carnaval. 🎭",
+            "Nivel descontrol: hasta tu sombra baila. 🕺",
+            "Picante como salsa habanera. 🌶️🔥"
         ];
 
-        function increaseMeter() {
-            if (meterValue < 100) {
-                meterValue += Math.floor(Math.random() * 20) + 10; // Aumenta entre 10 y 30%
-                if (meterValue > 100) meterValue = 100;
-                document.getElementById("indicator").style.width = meterValue + "%";
+        function measureLevel() {
+            const indicator = document.getElementById("indicator");
+            const fireIcon = document.getElementById("fire-icon");
+            const phrase = document.getElementById("phrase");
+            const video = document.getElementById("camera");
+            const canvas = document.getElementById("photoCanvas");
+            const ctx = canvas.getContext("2d");
 
-                // Cambia la frase aleatoriamente
-                document.getElementById("phrase").textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            // Asegura que la barra siempre llegue al 100%
+            indicator.style.width = "100%";
+            fireIcon.style.display = "block";
+
+            // Cambia la frase
+            phrase.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+
+            // Toma la foto
+            canvas.style.display = "block";
+            if (video.srcObject) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             }
         }
 
@@ -111,6 +155,9 @@
                     alert("No se pudo activar la cámara. Revisá los permisos.");
                 });
         }
+
+        // Activa la cámara al cargar la página
+        window.onload = startCamera;
     </script>
 </body>
 </html>

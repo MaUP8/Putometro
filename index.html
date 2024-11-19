@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Putómetro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #000, #800000);
+            color: #fff;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .meter {
+            margin: 20px auto;
+            width: 300px;
+            height: 50px;
+            background: #333;
+            border: 2px solid #ff0000;
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+        .indicator {
+            height: 100%;
+            border-radius: 25px;
+            background: linear-gradient(to right, red, orange, yellow);
+            width: 0%;
+            transition: width 0.5s ease-out;
+        }
+        .button {
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #ff0000;
+            color: #fff;
+            border: 2px solid #800000;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #cc0000;
+        }
+        video {
+            margin-top: 20px;
+            width: 300px;
+            height: auto;
+            border: 2px solid #ff0000;
+            border-radius: 10px;
+            display: none;
+        }
+        .phrase {
+            margin-top: 20px;
+            font-size: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Putómetro 🔥</h1>
+        <p>Mide tu "nivel de joda". Advertencia: no te lo tomes personal... ¡o sí! 😏</p>
+        <div class="meter">
+            <div class="indicator" id="indicator"></div>
+        </div>
+        <button class="button" onclick="increaseMeter()">Subir Nivel</button>
+        <button class="button" onclick="startCamera()">Activar Cámara</button>
+        <video id="camera" autoplay></video>
+        <div class="phrase" id="phrase"></div>
+    </div>
+
+    <script>
+        let meterValue = 0;
+        const phrases = [
+            "Te la mandaste toda, ¡nivel dios! 🔥",
+            "Aflojá, que así no se puede salir en público. 🤦‍♂️",
+            "Sos la reina de la noche. 👑",
+            "Mirá, ni la IA puede medir esto. 😱",
+            "100% peligro, cuidado al salir a la calle. 🚨",
+            "¿Con quién querés competir? Ya ganaste. 🏆",
+            "Una leyenda urbana de las pistas. 😎",
+            "Nivel: te invitan a todos lados por escándalo. 🎉"
+        ];
+
+        function increaseMeter() {
+            if (meterValue < 100) {
+                meterValue += Math.floor(Math.random() * 20) + 10; // Aumenta entre 10 y 30%
+                if (meterValue > 100) meterValue = 100;
+                document.getElementById("indicator").style.width = meterValue + "%";
+
+                // Cambia la frase aleatoriamente
+                document.getElementById("phrase").textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            }
+        }
+
+        function startCamera() {
+            const video = document.getElementById("camera");
+            video.style.display = "block";
+
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    video.srcObject = stream;
+                })
+                .catch((error) => {
+                    console.error("Error al acceder a la cámara: ", error);
+                    alert("No se pudo activar la cámara. Revisá los permisos.");
+                });
+        }
+    </script>
+</body>
+</html>

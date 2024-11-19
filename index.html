@@ -34,14 +34,6 @@
             width: 0%;
             transition: width 0.5s ease-out;
         }
-        .fire-icon {
-            position: absolute;
-            top: 50%;
-            right: 10px;
-            transform: translateY(-50%);
-            font-size: 24px;
-            display: none;
-        }
         .button {
             margin: 10px auto;
             padding: 10px 20px;
@@ -55,20 +47,53 @@
         .button:hover {
             background-color: #cc0000;
         }
-        video, canvas {
+        video {
             margin-top: 20px;
             width: 300px;
             height: auto;
             border: 2px solid #ff0000;
             border-radius: 10px;
         }
-        #photoCanvas {
+        canvas {
+            margin-top: 20px;
+            width: 300px;
+            height: auto;
+            border: 2px solid #ff0000;
+            border-radius: 10px;
             display: none; /* Oculto hasta que se toma la foto */
         }
-        .phrase {
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #333;
+            color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+        }
+        .close-button {
+            background-color: #ff0000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
             margin-top: 20px;
-            font-size: 20px;
-            font-style: italic;
+        }
+        .close-button:hover {
+            background-color: #cc0000;
         }
     </style>
 </head>
@@ -81,29 +106,35 @@
         <button class="button" id="takePhotoButton" onclick="takePhoto()">Tomar Foto</button>
         <div class="meter" id="meter">
             <div class="indicator" id="indicator"></div>
-            <div class="fire-icon" id="fire-icon">🔥</div>
         </div>
         <button class="button" id="measureButton" onclick="measureLevel()" style="display: none;">Medir Nivel</button>
-        <div class="phrase" id="phrase"></div>
+    </div>
+
+    <!-- Modal para mostrar el resultado -->
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <p id="resultText"></p>
+            <button class="close-button" onclick="resetMeasurement()">Cerrar</button>
+        </div>
     </div>
 
     <script>
         let phrases = [
-            "¡Sos fuego puro! 🔥",
-            "Rey/reina de la noche. 👑",
-            "Nadie te para, ni la IA. 🚀",
-            "Un peligro andante. 🚨",
-            "Sos un espectáculo en persona. 🎉",
-            "Te pasaste de épico/a. 😎",
-            "Tu nivel es ilegal en 50 países. 🌍",
-            "Cuidado, que incendias la pista. 💃🔥",
-            "¡Mirá cómo brillás, estrella fugaz! 🌟",
-            "Sos como una telenovela: puro drama y pasión. 😘",
-            "Te ven llegar y suben la música. 🎵",
-            "Bajale al fuego que estamos en alerta roja. 🚒",
-            "Sos como el tequila: fuerte y difícil de olvidar. 🥃",
-            "Nivel bomba: explotás en cada lugar que vas. 💣",
-            "Picante como salsa habanera. 🌶️🔥"
+            "¡Nivel legendario! 🔥 Sos imparable.",
+            "Sos el alma de la fiesta. 🎉",
+            "Te miran y suben la música. 🎵",
+            "Más caliente que una tarde en el Sahara. 🌞🔥",
+            "Sos la estrella que todos admiran. 🌟",
+            "Nadie puede contigo. 🏆",
+            "Nivel salsa habanera: puro picante. 🌶️",
+            "Te buscan para encender la fiesta. 💃",
+            "¡Cuidado, sos un incendio ambulante! 🚒",
+            "Protagonista de cada historia. 📖",
+            "¡Esto es puro fuego! 🔥",
+            "Sos irresistible, no hay escape. 😏",
+            "Con vos, todo es carnaval. 🎭",
+            "Tu intensidad rompe récords. 💥",
+            "¡Sos el MVP del descontrol! 🤪"
         ];
 
         const video = document.getElementById("camera");
@@ -111,6 +142,8 @@
         const ctx = canvas.getContext("2d");
         const meter = document.getElementById("meter");
         const measureButton = document.getElementById("measureButton");
+        const resultModal = document.getElementById("resultModal");
+        const resultText = document.getElementById("resultText");
 
         // Inicia la cámara al cargar la página
         function startCamera() {
@@ -124,29 +157,52 @@
                 });
         }
 
-        // Toma la foto y la muestra en el canvas
+        // Toma la foto, detiene la cámara y oculta el video
         function takePhoto() {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Oculta el video y muestra el canvas
+            video.style.display = "none";
             canvas.style.display = "block";
-            meter.style.display = "block"; // Muestra el medidor
-            measureButton.style.display = "block"; // Muestra el botón para medir nivel
+
+            // Muestra el medidor y botón para medir
+            meter.style.display = "block";
+            measureButton.style.display = "block";
             document.getElementById("takePhotoButton").style.display = "none"; // Oculta el botón de tomar foto
+
+            // Detiene la transmisión de video
+            const stream = video.srcObject;
+            const tracks = stream.getTracks();
+            tracks.forEach((track) => track.stop());
         }
 
-        // Mide el nivel y muestra el resultado
+        // Mide el nivel y muestra el resultado en el pop-up
         function measureLevel() {
             const indicator = document.getElementById("indicator");
-            const fireIcon = document.getElementById("fire-icon");
-            const phrase = document.getElementById("phrase");
 
-            // Asegura que la barra siempre llegue al 100%
-            indicator.style.width = "100%";
-            fireIcon.style.display = "block";
+            // Genera un nivel aleatorio entre 80 y 100
+            const level = Math.floor(Math.random() * 21) + 80;
+            indicator.style.width = `${level}%`;
 
-            // Cambia la frase
-            phrase.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+            // Muestra una frase aleatoria
+            const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+            resultText.textContent = `${randomPhrase} (Nivel: ${level}%)`;
+
+            // Abre el modal
+            resultModal.style.display = "flex";
+        }
+
+        // Resetea la medición y vuelve a cero
+        function resetMeasurement() {
+            resultModal.style.display = "none";
+            document.getElementById("indicator").style.width = "0%";
+            video.style.display = "block";
+            canvas.style.display = "none";
+            measureButton.style.display = "none";
+            document.getElementById("takePhotoButton").style.display = "block";
+            startCamera();
         }
 
         window.onload = startCamera;

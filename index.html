@@ -25,7 +25,7 @@
             border-radius: 25px;
             position: relative;
             overflow: hidden;
-            display: none; /* Oculto hasta que se mida */
+            display: none;
         }
         .indicator {
             height: 100%;
@@ -60,7 +60,7 @@
             height: auto;
             border: 2px solid #ff0000;
             border-radius: 10px;
-            display: none; /* Oculto hasta que se toma la foto */
+            display: none;
         }
         .modal {
             display: none;
@@ -101,7 +101,7 @@
     <div class="container">
         <h1>🔥 Putómetro 🔥</h1>
         <p>Tomá una foto y medí el nivel de "picante".</p>
-        <video id="camera" autoplay></video>
+        <video id="camera" autoplay playsinline></video>
         <canvas id="photoCanvas"></canvas>
         <button class="button" id="takePhotoButton" onclick="takePhoto()">Tomar Foto</button>
         <div class="meter" id="meter">
@@ -145,15 +145,15 @@
         const resultModal = document.getElementById("resultModal");
         const resultText = document.getElementById("resultText");
 
-        // Inicia la cámara al cargar la página
+        // Inicia la cámara trasera al cargar la página
         function startCamera() {
-            navigator.mediaDevices.getUserMedia({ video: true })
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: "environment" } } })
                 .then((stream) => {
                     video.srcObject = stream;
                 })
                 .catch((error) => {
                     console.error("Error al acceder a la cámara: ", error);
-                    alert("No se pudo activar la cámara. Revisá los permisos.");
+                    alert("No se pudo activar la cámara trasera. Revisá los permisos.");
                 });
         }
 
@@ -209,3 +209,4 @@
     </script>
 </body>
 </html>
+
